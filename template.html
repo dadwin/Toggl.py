@@ -95,6 +95,43 @@ body {
         // update timestamp
         $("#timestamp").text("Last generated "+timestamp);
 
+        /* =====================================================
+            Calculate team total
+           ===================================================== */
+        var total_name = 'Total load';
+        var totals = {};
+        var total_avgs = {};
+        var total_stds = {};
+        teams.forEach(function(team){
+            totals[team] = [];
+            var total_avg = 0;
+            var weeks = 0;
+            week_labels.forEach(function(week_label, index){
+                var week_total = null;
+                courses.forEach(function(course){
+                    if (report_data[course][team][index] != null) {
+                        if (week_total == null) week_total = 0;
+                        week_total += report_data[course][team][index];
+                    }
+                });
+                if (week_total != null) {
+                    weeks += 1;
+                    week_total = Math.round(week_total * 100) / 100;
+                }
+                totals[team].push(week_total);
+                total_avg += week_total;
+            });
+            total_avgs[team] = Math.round(total_avg * 100 / weeks) / 100;
+            total_stds[team] = 0;
+        });
+        courses.unshift(total_name);
+        report_data[total_name] = totals;
+        variance[total_name] = total_stds;
+        average[total_name] = total_avgs;
+        /* =====================================================
+            End of Total part
+           ===================================================== */
+
         week_labels.push('Avg');
 
         courses.forEach(function(course, index){
